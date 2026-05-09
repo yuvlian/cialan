@@ -1,0 +1,14 @@
+[package]
+name = "radar-website"
+edition = "2024"
+version.workspace = true
+
+[dependencies]
+radar-reader.workspace = true
+radar-dumper.workspace = true
+axum.workspace = true
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tower-http.workspace = true
+toml.workspace = true

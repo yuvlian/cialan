@@ -1,0 +1,9 @@
+[package]
+name = "radar-reader"
+edition = "2024"
+version.workspace = true
+
+[dependencies]
+memory.workspace = true
+serde.workspace = true
+toml.workspace = true

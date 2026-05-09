@@ -1,0 +1,8 @@
+[package]
+name = "vpk"
+edition = "2024"
+version.workspace = true
+
+[dependencies]
+crc32-v2.workspace = true
+chksum-hash-md5.workspace = true

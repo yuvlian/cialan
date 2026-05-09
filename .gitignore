@@ -1,0 +1,10 @@
+.vrf
+.assets
+**/target/
+radar-dumper.toml
+radar-reader.toml
+radar-website.toml
+**/refs/
+*.lock
+unused.md
+.prebuilt
