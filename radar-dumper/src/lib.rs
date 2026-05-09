@@ -46,19 +46,19 @@ impl Default for Config {
     }
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
 pub struct VerticalSection {
     pub name: String,
-    pub altitude_max: f32,
-    pub altitude_min: f32,
+    pub altitude_max: i16,
+    pub altitude_min: i16,
 }
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default)]
 pub struct Overview {
     pub map_name: String,
     pub material: String,
-    pub pos_x: f32,
-    pub pos_y: f32,
+    pub pos_x: i16,
+    pub pos_y: i16,
     pub scale: f32,
     pub vertical_sections: Vec<VerticalSection>,
     pub settings: HashMap<String, String>,
@@ -99,8 +99,16 @@ impl Overview {
                 if stack.len() == 1 {
                     match key {
                         "material" => overview.material = val.to_string(),
-                        "pos_x" => overview.pos_x = val.parse().unwrap_or(0.0),
-                        "pos_y" => overview.pos_y = val.parse().unwrap_or(0.0),
+                        "pos_x" => {
+                            overview.pos_x = val
+                                .parse::<i16>()
+                                .unwrap_or_else(|_| val.parse::<f32>().unwrap_or(0.0) as i16)
+                        }
+                        "pos_y" => {
+                            overview.pos_y = val
+                                .parse::<i16>()
+                                .unwrap_or_else(|_| val.parse::<f32>().unwrap_or(0.0) as i16)
+                        }
                         "scale" => overview.scale = val.parse().unwrap_or(1.0),
                         _ => {
                             overview.settings.insert(key.to_string(), val.to_string());
@@ -118,8 +126,16 @@ impl Overview {
                     }
                     let section = overview.vertical_sections.last_mut().unwrap();
                     match key {
-                        "AltitudeMax" => section.altitude_max = val.parse().unwrap_or(0.0),
-                        "AltitudeMin" => section.altitude_min = val.parse().unwrap_or(0.0),
+                        "AltitudeMax" => {
+                            section.altitude_max = val
+                                .parse::<i16>()
+                                .unwrap_or_else(|_| val.parse::<f32>().unwrap_or(0.0) as i16)
+                        }
+                        "AltitudeMin" => {
+                            section.altitude_min = val
+                                .parse::<i16>()
+                                .unwrap_or_else(|_| val.parse::<f32>().unwrap_or(0.0) as i16)
+                        }
                         _ => {}
                     }
                 }

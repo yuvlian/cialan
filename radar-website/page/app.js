@@ -5,13 +5,72 @@ const mapNameEl = document.getElementById('map-name');
 
 let currentOverview = null;
 
+class BinaryReader {
+    constructor(buffer) {
+        this.view = new DataView(buffer);
+        this.offset = 0;
+        this.decoder = new TextDecoder();
+    }
+    readU8() {
+        return this.view.getUint8(this.offset++);
+    }
+    readI16() {
+        const val = this.view.getInt16(this.offset, true);
+        this.offset += 2;
+        return val;
+    }
+    readU16() {
+        const val = this.view.getUint16(this.offset, true);
+        this.offset += 2;
+        return val;
+    }
+    readString() {
+        const len = this.readU8();
+        const bytes = new Uint8Array(this.view.buffer, this.offset, len);
+        this.offset += len;
+        return this.decoder.decode(bytes);
+    }
+}
+
 function connect() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+    socket.binaryType = 'arraybuffer';
 
     socket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        updateUI(data);
+        const reader = new BinaryReader(event.data);
+
+        const map_name = reader.readString();
+        let overview = null;
+        if (reader.readU8() === 1) {
+            overview = {
+                pos_x: reader.readI16(),
+                pos_y: reader.readI16(),
+                scale: reader.readU16() / 1000.0,
+            }
+            const vsCount = reader.readU8();
+            overview.vertical_sections = new Array(vsCount);
+            for (let i = 0; i < vsCount; i++) {
+                overview.vertical_sections[i] = {
+                    name: reader.readString(),
+                    altitude_max: reader.readI16(),
+                    altitude_min: reader.readI16()
+                };
+            }
+        }
+
+        const playerCount = reader.readU8();
+        const players = new Array(playerCount);
+        for (let i = 0; i < playerCount; i++) {
+            players[i] = {
+                name: reader.readString(),
+                health: reader.readU8(),
+                team: reader.readU8(),
+                pos: [reader.readI16(), reader.readI16(), reader.readI16()]
+            };
+        }
+
+        updateUI({ map_name, overview, players });
     };
 
     socket.onclose = () => {

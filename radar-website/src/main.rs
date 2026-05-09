@@ -8,7 +8,7 @@ use axum::{
     routing::get,
 };
 use radar_dumper::{Config, Overview};
-use radar_reader::{CS2Reader, Player};
+use radar_reader::CS2Reader;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -21,12 +21,8 @@ use tokio::runtime::Runtime;
 use tokio::sync::broadcast;
 use tower_http::services::ServeDir;
 
-#[derive(Serialize, Deserialize, Clone)]
-struct WebState {
-    map_name: String,
-    overview: Option<Overview>,
-    players: Vec<Player>,
-}
+mod serialization;
+use serialization::WebState;
 
 struct AppState {
     tx: broadcast::Sender<WebState>,
@@ -177,18 +173,17 @@ async fn handle_socket(mut socket: WebSocket, state: Arc<AppState>) {
 
     let initial = {
         let last = state.last_state.lock().unwrap();
-        serde_json::to_string(&*last).unwrap()
+        last.to_binary()
     };
 
-    if socket.send(Message::Text(initial.into())).await.is_err() {
+    if socket.send(Message::Binary(initial.into())).await.is_err() {
         return;
     }
 
     while let Ok(new_state) = rx.recv().await {
-        if let Ok(msg) = serde_json::to_string(&new_state) {
-            if socket.send(Message::Text(msg.into())).await.is_err() {
-                break;
-            }
+        let msg = new_state.to_binary();
+        if socket.send(Message::Binary(msg.into())).await.is_err() {
+            break;
         }
     }
 }

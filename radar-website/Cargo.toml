@@ -9,6 +9,5 @@ radar-dumper.workspace = true
 axum.workspace = true
 tokio.workspace = true
 serde.workspace = true
-serde_json.workspace = true
 tower-http.workspace = true
 toml.workspace = true

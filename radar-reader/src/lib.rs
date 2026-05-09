@@ -5,7 +5,7 @@ use std::fs;
 use std::path::Path;
 use std::sync::OnceLock;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Player {
     pub name: String,
     pub health: i32,
