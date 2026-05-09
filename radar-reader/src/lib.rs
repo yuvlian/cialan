@@ -127,7 +127,7 @@ impl CS2Reader {
         if name_ptr != 0 && name_ptr > 0x1000000 {
             if self
                 .process
-                .read_raw(name_ptr, name_bytes.as_mut_ptr() as _, 64)
+                .read_raw(name_ptr, name_bytes.as_mut_ptr() as _, 32)
             {
                 if let Ok(s) = CStr::from_bytes_until_nul(&name_bytes) {
                     let map = s.to_string_lossy();
