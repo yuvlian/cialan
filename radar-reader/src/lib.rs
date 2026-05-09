@@ -127,7 +127,7 @@ impl CS2Reader {
         if name_ptr != 0 && name_ptr > 0x1000000 {
             if self
                 .process
-                .read_raw(name_ptr, name_bytes.as_mut_ptr() as _, 32)
+                .read_raw(name_ptr, name_bytes.as_mut_ptr() as _, name_bytes.len())
             {
                 if let Ok(s) = CStr::from_bytes_until_nul(&name_bytes) {
                     let map = s.to_string_lossy();
@@ -142,13 +142,13 @@ impl CS2Reader {
     }
 
     pub fn get_players(&self) -> Vec<Player> {
-        let mut players = Vec::with_capacity(512);
+        let mut players = Vec::with_capacity(22);
         let entity_list = self.process.read::<usize>(self.entity_list_ptr);
         if entity_list == 0 {
             return players;
         }
 
-        for i in 1..=players.capacity() {
+        for i in 1..=64 {
             let list_entry = self
                 .process
                 .read::<usize>(entity_list + (8 * (i >> 9)) + 16);
