@@ -142,7 +142,7 @@ impl CS2Reader {
     }
 
     pub fn get_players(&self) -> Vec<Player> {
-        let mut players = Vec::with_capacity(22);
+        let mut players = Vec::with_capacity(512);
         let entity_list = self.process.read::<usize>(self.entity_list_ptr);
         if entity_list == 0 {
             return players;
